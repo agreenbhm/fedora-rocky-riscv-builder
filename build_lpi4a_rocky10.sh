@@ -101,8 +101,11 @@ mk_img() {
     echo "LABEL=rocky-root  / ext4    defaults,noatime 0 0" > ${build_dir}/rootfs/etc/fstab
     echo "LABEL=rocky-boot  /boot vfat    defaults,noatime 0 0" >> ${build_dir}/rootfs/etc/fstab
 
-    cp -rfp ${build_dir}/rootfs/boot/* $boot_mnt || true
-    rm -rf ${build_dir}/rootfs/boot/* || true
+    if [ $(ls -1 ${build_dir}/rootfs/boot/ | wc -l) -gt 0 ]
+    then
+	cp -rfp ${build_dir}/rootfs/boot/* $boot_mnt
+	rm -rf ${build_dir}/rootfs/boot/*
+    fi
 
     rsync -avHAXq ${build_dir}/rootfs/* ${root_mnt}
     sync
