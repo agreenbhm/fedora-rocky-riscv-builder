@@ -69,8 +69,8 @@ mk_img() {
     sdbootp=/dev/mapper/${loopX}p1
     sdrootp=/dev/mapper/${loopX}p2
     
-    mkfs.vfat -n fedora-boot ${sdbootp}
-    mkfs.ext4 -L fedora-root ${sdrootp}
+    mkfs.vfat -n rocky-boot ${sdbootp}
+    mkfs.ext4 -L rocky-root ${sdrootp}
     mkdir -p ${root_mnt} ${boot_mnt}
     mount ${sdbootp} ${boot_mnt}
     mount ${sdrootp} ${root_mnt}
@@ -85,7 +85,7 @@ mk_img() {
     uuid=${line#*UUID=\"}
     uuid=${uuid%%\"*}
     
-    echo "label Fedora
+    echo "label Rocky Linux
     kernel /Image
     initrd /initrd.img
     fdtdir /
@@ -98,11 +98,11 @@ mk_img() {
     cp $build_dir/thead-kernel/arch/riscv/boot/Image $boot_mnt
     cp $build_dir/thead-kernel/arch/riscv/boot/dts/thead/*lpi4a*dtb $boot_mnt
 
-    echo "LABEL=fedora-root  / ext4    defaults,noatime 0 0" > ${build_dir}/rootfs/etc/fstab
-    echo "LABEL=fedora-boot  /boot vfat    defaults,noatime 0 0" >> ${build_dir}/rootfs/etc/fstab
+    echo "LABEL=rocky-root  / ext4    defaults,noatime 0 0" > ${build_dir}/rootfs/etc/fstab
+    echo "LABEL=rocky-boot  /boot vfat    defaults,noatime 0 0" >> ${build_dir}/rootfs/etc/fstab
 
-    cp -rfp ${build_dir}/rootfs/boot/* $boot_mnt
-    rm -rf ${build_dir}/rootfs/boot/*
+    cp -rfp ${build_dir}/rootfs/boot/* $boot_mnt || true
+    rm -rf ${build_dir}/rootfs/boot/* || true
 
     rsync -avHAXq ${build_dir}/rootfs/* ${root_mnt}
     sync
@@ -125,9 +125,9 @@ comp_img() {
     fi
 
     xz -v sd.img
-    mv sd.img.xz Fedora-${fedora_version}-Minimal-LicheePi-4A-riscv64-sd.img.xz
+    mv sd.img.xz ${fedora_version}-Minimal-LicheePi-4A-riscv64-sd.img.xz
 
-    sha256sum Fedora-${fedora_version}-Minimal-LicheePi-4A-riscv64-sd.img.xz >> Fedora-${fedora_version}-Minimal-LicheePi-4A-riscv64-sd.img.xz.sha256
+    sha256sum ${fedora_version}-Minimal-LicheePi-4A-riscv64-sd.img.xz >> ${fedora_version}-Minimal-LicheePi-4A-riscv64-sd.img.xz.sha256
 
 }
 
@@ -150,4 +150,4 @@ build_kernel
 build_u-boot
 build_opensbi
 mk_img
-comp_img
+#comp_img

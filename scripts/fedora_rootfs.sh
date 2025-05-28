@@ -6,6 +6,9 @@ fedora_repos_41="http://fedora.riscv.rocks/repos-dist/f41/latest/riscv64/Package
 fedora_release_42="http://fedora.riscv.rocks/repos-dist/f42/latest/riscv64/Packages/f/fedora-release-42-26.noarch.rpm"
 fedora_repos_42="http://fedora.riscv.rocks/repos-dist/f42/latest/riscv64/Packages/f/fedora-repos-42-1.0.riscv64.noarch.rpm"
 
+rocky_release_10="https://download.rockylinux.org/stg/rocky/10/BaseOS/riscv64/os/Packages/r/rocky-release-10.0-1.4.el10.noarch.rpm"
+rocky_repos_10="https://download.rockylinux.org/stg/rocky/10/BaseOS/riscv64/os/Packages/r/rocky-repos-10.0-1.4.el10.noarch.rpm"
+
 init_base_system() {
     fedora_version=$1
     
@@ -15,8 +18,11 @@ init_base_system() {
     elif [ "x$fedora_version" == "x42" ]; then
         fedora_release=${fedora_release_42}
         fedora_repos=${fedora_repos_42}
+    elif [ "x$fedora_version" == "x10" ]; then
+        fedora_release=${rocky_release_10}
+        fedora_repos=${rocky_repos_10}
     else
-        echo "unsupported fedora version by this script."
+        echo "unsupported fedora/rocky version by this script."
         exit 2
     fi
     
@@ -47,17 +53,32 @@ install_riscv_pkgs() {
     mount -t proc /proc ${rootfs_dir}/proc
     mount -t sysfs /sys ${rootfs_dir}/sys
 
+    if [ "$fedora_version" == "10" ]
+    then
+        rm ${rootfs_dir}/etc/yum.repos.d/rocky-extras.repo
+    fi
+
     chroot ${rootfs_dir} dnf makecache
     chroot ${rootfs_dir} dnf update -y
-    chroot ${rootfs_dir} dnf install alsa-utils haveged wpa_supplicant vim net-tools iproute iputils NetworkManager bluez fedora-release-server passwd hostname -y
-    chroot ${rootfs_dir} dnf install wget openssh-server openssh-clients parted realtek-firmware chkconfig e2fsprogs dracut NetworkManager-wifi -y
-    echo fedora-riscv > ${rootfs_dir}/etc/hostname
+    chroot ${rootfs_dir} dnf install wpa_supplicant vim net-tools iproute iputils NetworkManager bluez passwd hostname -y --nogpgcheck
+    chroot ${rootfs_dir} dnf install wget openssh-server openssh-clients parted chkconfig e2fsprogs dracut NetworkManager-wifi -y --nogpgcheck
+    if [ "$fedora_version" != "10" ]
+    then
+        chroot ${rootfs_dir} dnf install alsa-utils haveged fedora-release-server realtek-firmware -y --nogpgcheck
+        echo fedora-riscv > ${rootfs_dir}/etc/hostname
+        rootpass='fedora'
+    else
+	chroot ${rootfs_dir} dnf install rocky-gpg-keys -y --nogpgcheck
+        echo rocky-riscv > ${rootfs_dir}/etc/hostname
+        rootpass='rocky'
+    fi
+
     cp $build_dir/config/extend-root.sh ${rootfs_dir}/etc/rc.d/init.d/extend-root.sh
     chmod +x ${rootfs_dir}/etc/rc.d/init.d/extend-root.sh
     sed -i "s|#PermitRootLogin prohibit-password|PermitRootLogin yes|g" ${rootfs_dir}/etc/ssh/sshd_config
 
     cat << EOF | chroot ${rootfs_dir}  /bin/bash
-    echo 'fedora' | passwd --stdin root
+    echo '$rootpass' | passwd --stdin root
     chkconfig --add extend-root.sh
     chkconfig extend-root.sh on
     dracut --no-kernel /boot/initrd.img
