@@ -128,9 +128,9 @@ comp_img() {
     fi
 
     xz -v sd.img
-    mv sd.img.xz ${fedora_version}-Minimal-LicheePi-4A-riscv64-sd.img.xz
+    mv sd.img.xz Rocky-${fedora_version}-Minimal-LicheePi-4A-riscv64-sd.img.xz
 
-    sha256sum ${fedora_version}-Minimal-LicheePi-4A-riscv64-sd.img.xz >> ${fedora_version}-Minimal-LicheePi-4A-riscv64-sd.img.xz.sha256
+    sha256sum Rocky-${fedora_version}-Minimal-LicheePi-4A-riscv64-sd.img.xz >> Rocky-${fedora_version}-Minimal-LicheePi-4A-riscv64-sd.img.xz.sha256
 
 }
 

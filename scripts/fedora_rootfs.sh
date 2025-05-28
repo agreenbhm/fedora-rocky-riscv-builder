@@ -18,9 +18,10 @@ init_base_system() {
     elif [ "x$fedora_version" == "x42" ]; then
         fedora_release=${fedora_release_42}
         fedora_repos=${fedora_repos_42}
-    elif [ "x$fedora_version" == "x10" ]; then
+    elif [ "x$fedora_version" == "xrocky10" ]; then
         fedora_release=${rocky_release_10}
         fedora_repos=${rocky_repos_10}
+	fedora_version=10
     else
         echo "unsupported fedora/rocky version by this script."
         exit 2

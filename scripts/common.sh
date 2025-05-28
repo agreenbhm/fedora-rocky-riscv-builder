@@ -4,7 +4,7 @@ __usage="
 Usage: build [OPTIONS]
 
 Options: 
-  --fedora_version FEDORA_VERSION
+  --fedora_version <41|42|rocky10>
   -h, --help
 "
 
