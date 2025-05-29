@@ -9,8 +9,10 @@ build_kernel() {
     if [ -f arch/riscv/configs/linux-thead-current_defconfig ]; then
         rm arch/riscv/configs/linux-thead-current_defconfig
     fi
-    #cp $build_dir/config/linux-thead-current.config arch/riscv/configs/linux-thead-current_defconfig
-    ln -sf $build_dir/thead-kernel/arch/riscv/configs/revyos_defconfig arch/riscv/configs/linux-thead-current_defconfig
+
+    #ln -sf $build_dir/thead-kernel/arch/riscv/configs/revyos_defconfig arch/riscv/configs/linux-thead-current_defconfig
+    ln -sf $build_dir/config/lpi4a_6.6.92_defconfig arch/riscv/configs/linux-thead-current_defconfig
+
     make ARCH=riscv CROSS_COMPILE=riscv64-linux-gnu- linux-thead-current_defconfig
     make ARCH=riscv CROSS_COMPILE=riscv64-linux-gnu- -j$(nproc)
     make ARCH=riscv CROSS_COMPILE=riscv64-linux-gnu- modules_install INSTALL_MOD_PATH=kmod

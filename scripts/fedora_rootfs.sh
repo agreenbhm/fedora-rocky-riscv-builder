@@ -62,17 +62,22 @@ install_riscv_pkgs() {
     chroot ${rootfs_dir} dnf makecache
     chroot ${rootfs_dir} dnf update -y
     chroot ${rootfs_dir} dnf install wpa_supplicant vim net-tools iproute iputils NetworkManager bluez passwd hostname -y --nogpgcheck
-    chroot ${rootfs_dir} dnf install wget openssh-server openssh-clients parted chkconfig e2fsprogs dracut NetworkManager-wifi -y --nogpgcheck
+    chroot ${rootfs_dir} dnf install wget openssh-server openssh-clients parted chkconfig e2fsprogs dracut NetworkManager-wifi NetworkManager-tui NetworkManager-bluetooth -y --nogpgcheck
     if [ "$fedora_version" != "10" ]
     then
         chroot ${rootfs_dir} dnf install alsa-utils haveged fedora-release-server realtek-firmware -y --nogpgcheck
         echo fedora-riscv > ${rootfs_dir}/etc/hostname
         rootpass='fedora'
     else
-	chroot ${rootfs_dir} dnf install rocky-gpg-keys -y --nogpgcheck
+	chroot ${rootfs_dir} dnf install rocky-gpg-keys chrony -y --nogpgcheck
         echo rocky-riscv > ${rootfs_dir}/etc/hostname
         rootpass='rocky'
     fi
+
+    mkdir -p $rootfs_dir/lib/firmware/{rtw88,rtl_bt}
+    wget -P $rootfs_dir/lib/firmware/rtw88/ https://github.com/armbian/firmware/raw/refs/heads/master/rtw88/rtw8723d_fw.bin
+    wget -P $rootfs_dir/lib/firmware/rtl_bt/ https://github.com/armbian/firmware/raw/refs/heads/master/rtl_bt/rtl8723ds_config.bin
+    wget -P $rootfs_dir/lib/firmware/rtl_bt/ https://github.com/armbian/firmware/raw/refs/heads/master/rtl_bt/rtl8723ds_fw.bin
 
     cp $build_dir/config/extend-root.sh ${rootfs_dir}/etc/rc.d/init.d/extend-root.sh
     chmod +x ${rootfs_dir}/etc/rc.d/init.d/extend-root.sh
