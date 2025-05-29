@@ -18,6 +18,21 @@ build_kernel() {
     make ARCH=riscv CROSS_COMPILE=riscv64-linux-gnu- modules_install INSTALL_MOD_PATH=kmod
     cd $build_dir
     cp -rfp thead-kernel/kmod/lib/modules/* rootfs/lib/modules
+
+    cd rootfs/root
+    git clone https://github.com/lwfinger/rtw88.git
+    cd rtw88
+    sed -i "s/^KVER.*/KVER := 6\.6\.92\+/g" Makefile
+    sed -i "s|^KSRC.*|KSRC := $build_dir/thead-kernel|g" Makefile
+    make ARCH=riscv CROSS_COMPILE=riscv64-linux-gnu- -j$(nproc)
+    mkdir -p $build_dir/rootfs/lib/modules/6.6.92+/kernel/drivers/net/wireless/realtek/rtw88/
+    cp *.ko $build_dir/rootfs/lib/modules/6.6.92+/kernel/drivers/net/wireless/realtek/rtw88/
+    cp rtw88.conf $build_dir/rootfs/etc/modprobe.d/
+    mkdir -p $build_dir/rootfs/lib/firmware/rtw88
+    cp -R firmware/* $build_dir/rootfs/lib/firmware/rtw88/
+    cd $build_dir
+    chroot rootfs depmod 6.6.92+
+    rm -rf rootfs/root/rtw88
 }
 
 build_u-boot() {

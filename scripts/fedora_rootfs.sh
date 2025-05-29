@@ -75,7 +75,7 @@ install_riscv_pkgs() {
     fi
 
     mkdir -p $rootfs_dir/lib/firmware/{rtw88,rtl_bt}
-    wget -P $rootfs_dir/lib/firmware/rtw88/ https://github.com/armbian/firmware/raw/refs/heads/master/rtw88/rtw8723d_fw.bin
+    #wget -P $rootfs_dir/lib/firmware/rtw88/ https://github.com/armbian/firmware/raw/refs/heads/master/rtw88/rtw8723d_fw.bin
     wget -P $rootfs_dir/lib/firmware/rtl_bt/ https://github.com/armbian/firmware/raw/refs/heads/master/rtl_bt/rtl8723ds_config.bin
     wget -P $rootfs_dir/lib/firmware/rtl_bt/ https://github.com/armbian/firmware/raw/refs/heads/master/rtl_bt/rtl8723ds_fw.bin
 
