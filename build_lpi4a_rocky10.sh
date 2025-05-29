@@ -27,13 +27,13 @@ build_kernel() {
     make ARCH=riscv CROSS_COMPILE=riscv64-linux-gnu- -j$(nproc)
     mkdir -p $build_dir/rootfs/lib/modules/6.6.92+/kernel/drivers/net/wireless/realtek/rtw88/
     cp *.ko $build_dir/rootfs/lib/modules/6.6.92+/kernel/drivers/net/wireless/realtek/rtw88/
-    sed -i 's/blacklist rtw88/blacklist rtw/g' rtw88.conf
-    cp rtw88.conf $build_dir/rootfs/etc/modprobe.d/
+    #sed -i 's/blacklist rtw88/blacklist rtw/g' rtw88.conf
+    #cp rtw88.conf $build_dir/rootfs/etc/modprobe.d/
     mkdir -p $build_dir/rootfs/lib/firmware/rtw88
     cp -R firmware/* $build_dir/rootfs/lib/firmware/rtw88/
     cd $build_dir
     chroot rootfs depmod 6.6.92+
-    #rm -rf rootfs/root/rtw88
+    rm -rf rootfs/root/rtw88
 }
 
 build_u-boot() {
